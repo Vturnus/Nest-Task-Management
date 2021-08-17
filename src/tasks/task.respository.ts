@@ -21,7 +21,7 @@ export class TaskRepository extends Repository<Task> {
 
     if (search) {
       query.andWhere(
-        'task.title LIKE :search OR task.description LIKE :search',
+        '(LOWER(task.title) LIKE LOWER(:search) OR LOWER(task.description) LIKE LOWER(:search))',
         { search: `%${search}%` },
       );
     }
@@ -47,7 +47,7 @@ export class TaskRepository extends Repository<Task> {
     task.user = user;
 
     try {
-      await task.save();
+      await this.save(task);
     } catch (error) {
       this.logger.error(
         `Failed to create task for user ${user.username}. Data: ${createTaskDto}`,
